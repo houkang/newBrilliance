@@ -7,6 +7,7 @@
 //
 
 #import "AppDelegate.h"
+#import "firstLaunchViewController.h"
 
 @interface AppDelegate ()
 
@@ -17,6 +18,29 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSString *currentVersion = [[[NSBundle mainBundle] infoDictionary]objectForKey:@"CFBundleShortVersionString"];
+    NSString *lastRunKey = [defaults objectForKey:@"last_run_version_key"];
+    if (!lastRunKey) {
+        [defaults setObject:currentVersion forKey:@"last_run_version_key"];
+        //上次运行版本为空，app为首次运行
+        NSLog(@"上次运行版本为空，app为首次运行");
+        
+        firstLaunchViewController *firstLaunchVC = [[firstLaunchViewController alloc]init];
+        NSString *path =[[NSBundle mainBundle]pathForResource:@"movie" ofType:@"mp4"];
+        firstLaunchVC.movieURL = [NSURL fileURLWithPath:path];
+        self.window.rootViewController = firstLaunchVC;
+        
+    }
+    else if (![lastRunKey isEqualToString:currentVersion]) {
+        [defaults setObject:currentVersion forKey:@"last_run_version_key"];
+        //app更新了，版本号发生了变化
+        NSLog(@"app更新了，版本号发生了变化");
+        
+    }else{
+        NSLog(@"直接进入登录界面");
+        
+    }
     return YES;
 }
 
@@ -46,6 +70,5 @@
 - (void)applicationWillTerminate:(UIApplication *)application {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 }
-
 
 @end
